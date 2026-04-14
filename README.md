@@ -1,6 +1,6 @@
 # AgentRAG — Modular RAG pipeline for AI agents. Chunking, embedding, retrieval, and reranking with pluggable vector stores. Built for agenic workflows
 
-Modular RAG pipeline for AI agents. Chunking, embedding, retrieval, and reranking with pluggable vector stores. Built for agenic workflows. AgentRAG gives you a focused, inspectable implementation of that idea.
+Modular RAG pipeline for AI agents. Chunking, embedding, retrieval, and reranking with pluggable vector stores. Built for agenic workflows.
 
 ## Why AgentRAG
 
