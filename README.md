@@ -17,9 +17,9 @@ That means:
 
 ## Current Status
 
-AgentRAG is currently at an early public stage.
+AgentRAG is now at the first runnable implementation stage.
 
-The repository is still minimal, and this README mainly documents the project direction. As implementation work lands, this repo will evolve into a more concrete toolkit with runnable components, examples, and integration patterns.
+The repository includes a small Python package with core RAG pipeline interfaces plus an in-memory reference pipeline for indexing and retrieval. The goal is still to keep the surface area small while making the architecture concrete enough to extend.
 
 ## Project Direction
 
@@ -49,11 +49,38 @@ RAG is no longer just about search quality. In agent systems, retrieval affects 
 
 Near-term priorities include:
 
-- establishing the first code structure
-- defining the core retrieval pipeline interfaces
-- adding example workflows for indexing and retrieval
 - documenting integration patterns for agent runtimes
 - building toward more realistic retrieval experiments
+
+## Reference Implementation
+
+The first working implementation now includes:
+
+- `Document`, `Chunk`, `IndexedChunk`, and `SearchResult` models
+- protocol-style interfaces for `Chunker`, `Embedder`, `VectorStore`, and `Retriever`
+- `SimpleWordChunker` for local chunking experiments
+- `BagOfWordsEmbedder` for deterministic local embeddings
+- `InMemoryVectorStore` plus `InMemoryRAGPipeline` for end-to-end indexing and retrieval
+
+### Example
+
+```python
+from agentrag import Document, InMemoryRAGPipeline
+
+pipeline = InMemoryRAGPipeline()
+pipeline.index_documents(
+    [
+        Document(
+            id="doc-1",
+            text="Ganapathi homam is performed before major life events to remove obstacles.",
+        )
+    ]
+)
+
+response = pipeline.retrieve("Which ritual helps remove obstacles?", top_k=1)
+for result in response.results:
+    print(result.chunk.document_id, result.score, result.chunk.text)
+```
 
 ## Contributing
 
@@ -69,7 +96,17 @@ Contributions, ideas, and feedback are welcome, especially around:
 
 ```text
 AgentRAG/
-└── README.md
+├── README.md
+├── pyproject.toml
+├── src/agentrag/
+└── tests/
 ```
 
-The repository is intentionally minimal right now while the initial implementation direction is being defined.
+## Getting Started
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+pytest
+```
