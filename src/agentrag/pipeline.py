@@ -48,8 +48,6 @@ class SimpleWordChunker:
                     },
                 )
             )
-            if start + self.chunk_size >= len(words):
-                break
         return chunks
 
 
