@@ -7,7 +7,15 @@ import re
 from collections import Counter
 from dataclasses import dataclass
 
-from agentrag.interfaces import Chunk, Chunker, Document, Embedder, IndexedChunk, SearchResult, VectorStore
+from agentrag.interfaces import (
+    Chunk,
+    Chunker,
+    Document,
+    Embedder,
+    IndexedChunk,
+    SearchResult,
+    VectorStore,
+)
 
 
 def _tokenize(text: str) -> list[str]:
@@ -48,6 +56,11 @@ class SimpleWordChunker:
                     },
                 )
             )
+            # Once a window reaches the end of the document, stop. Any further
+            # start positions would only re-cover already-included tail words,
+            # producing a redundant chunk that is a strict subset of this one.
+            if start + self.chunk_size >= len(words):
+                break
         return chunks
 
 
@@ -128,7 +141,9 @@ class InMemoryRAGPipeline:
         for document in documents:
             chunks.extend(self.chunker.chunk(document))
 
-        embeddings = self.embedder.embed([chunk.text for chunk in chunks]) if chunks else []
+        embeddings = (
+            self.embedder.embed([chunk.text for chunk in chunks]) if chunks else []
+        )
         indexed = [
             IndexedChunk(
                 id=chunk.id,
@@ -144,7 +159,9 @@ class InMemoryRAGPipeline:
 
     def retrieve(self, query: str, top_k: int = 5) -> RetrievalResponse:
         query_embedding = self.embedder.embed([query])[0]
-        return RetrievalResponse(query=query, results=self.vector_store.search(query_embedding, top_k))
+        return RetrievalResponse(
+            query=query, results=self.vector_store.search(query_embedding, top_k)
+        )
 
 
 def _cosine_similarity(left: list[float], right: list[float]) -> float:
